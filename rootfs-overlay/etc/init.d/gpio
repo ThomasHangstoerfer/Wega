@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# configures gpios for buttons and leds 
+#
+
+case "$1" in
+        start)
+				echo 20  > /sys/class/gpio/export # button 1
+				echo 7   > /sys/class/gpio/export # button 2
+				echo 106 > /sys/class/gpio/export # button 3
+				echo 83  > /sys/class/gpio/export # led_orange
+				echo 82  > /sys/class/gpio/export # led_red
+
+				echo out  > /sys/class/gpio/gpio83/direction # led_orange
+				echo out  > /sys/class/gpio/gpio82/direction # led_red
+
+				echo in  > /sys/class/gpio/gpio20/direction  # button 1
+				echo in  > /sys/class/gpio/gpio7/direction   # button 2
+				echo in  > /sys/class/gpio/gpio106/direction # button 3
+
+				echo rising  > /sys/class/gpio/gpio20/edge   # button 1
+				echo rising  > /sys/class/gpio/gpio7/edge    # button 1
+				echo rising  > /sys/class/gpio/gpio106/edge  # button 1
+
+				(echo 1 > /sys/class/gpio/gpio83/value ; sleep 1 ; echo 0 > /sys/class/gpio/gpio83/value ; sleep 1 ; echo 1 > /sys/class/gpio/gpio83/value ; sleep 1 ; echo 0 > /sys/class/gpio/gpio83/value ; ) &
+
+
+                ;;
+        stop)
+                ;;
+        *)
+                echo "Usage: $0 {start|stop}"
+                exit 1
+                ;;
+esac
+exit 0
+
