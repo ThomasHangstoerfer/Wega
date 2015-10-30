@@ -1,0 +1,11 @@
+#!/bin/sh
+
+DELAY_IN_S=`expr 60 \* 15` # every 15 min
+
+while true 
+do
+	TIMESTAMP=`date -I'seconds'`
+	TEMP=`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`
+	echo "$TIMESTAMP - $TEMP" >> /tmp/temperature.log
+	sleep $DELAY_IN_S
+done
