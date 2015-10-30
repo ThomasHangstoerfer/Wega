@@ -7,5 +7,14 @@ do
 	TIMESTAMP=`date -I'seconds'`
 	TEMP=`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`
 	echo "$TIMESTAMP $TEMP" >> /tmp/temperature.log
+	if [ -e /sys/class/gpio/gpio82/value ]
+	then
+		if [ `cat /sys/class/gpio/gpio82/value` == '0' ]
+			then
+				echo 1 > /sys/class/gpio/gpio82/value
+			else
+				echo 0 > /sys/class/gpio/gpio82/value
+		fi
+	fi
 	sleep $DELAY_IN_S
 done
