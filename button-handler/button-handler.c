@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <syslog.h>
 
  /****************************************************************
  * Constants
@@ -286,6 +287,7 @@ int main(int argc, char **argv, char **envp)
 			else
 			{
 				printf("\npoll() GPIO %d interrupt occurred -> Button 1\n", 20);
+				syslog(LOG_ERR, "* BUTTON 1 *");
 				//printf("buf[0] = %i\n", (int)buf[0]);
 			}
 		}
@@ -299,6 +301,7 @@ int main(int argc, char **argv, char **envp)
 			else
 			{
 				printf("\npoll() GPIO %d interrupt occurred -> Button 2\n", 7);
+				syslog(LOG_ERR, "* BUTTON 2 *");
 			}
 		}
 
@@ -311,6 +314,7 @@ int main(int argc, char **argv, char **envp)
 			else
 			{
 				printf("\npoll() GPIO %d interrupt occurred -> Button 3\n", 106);
+				syslog(LOG_ERR, "* BUTTON 3 *");
 			}
 		}
 

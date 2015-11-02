@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# starts process to handle button-events 
+#
+
+case "$1" in
+        start)
+                /usr/local/bin/button-handler &
+                ;;
+        stop)
+		killall button-handler
+                ;;
+        *)
+                echo "Usage: $0 {start|stop}"
+                exit 1
+                ;;
+esac
+exit 0
+
