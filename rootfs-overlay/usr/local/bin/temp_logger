@@ -1,11 +1,18 @@
-#!/bin/sh
+#!/bin/bash
 
 DELAY_IN_S=`expr 60 \* 15` # every 15 min
 
 while true 
 do
 	TIMESTAMP=`date -I'seconds'`
-	TEMP=`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`
+	#TEMP=`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`
+	#TEMP=`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`
+	#TEMP=$(/usr/bin/bc <<<  $TEMP/1000 )
+	let TEMP="`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`"
+	TEMP=`echo ${TEMP}/1000 | /usr/bin/bc -l`
+	TEMP=`printf "%.1f" $TEMP`
+	echo TEMP: $TEMP
+
 	echo "$TIMESTAMP $TEMP" >> /tmp/temperature.log
 	if [ -e /sys/class/gpio/gpio82/value ]
 	then
@@ -16,5 +23,6 @@ do
 				echo 0 > /sys/class/gpio/gpio82/value
 		fi
 	fi
+	/usr/bin/gnuplot /etc/temp.plot
 	sleep $DELAY_IN_S
 done
