@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# starts process to continuously log temperature-values
+#
+
+case "$1" in
+        start)
+	        echo "#####################################################" > /dev/kmsg
+        	(modprobe rtl8192cu 2>&1 > /dev/kmsg ) &
+	        sleep 2
+	        echo "#####################################################" > /dev/kmsg
+	        cd /sys/class/firmware/1-1
+	        echo 1 > loading 
+	        cat /lib/firmware/rtlwifi/rtl8192cufw.bin > data 
+	        echo 0 > loading 
+	        sleep 1
+	        ip link set wlan0 up 2>&1 > /dev/kmsg
+	        sleep 1
+        
+        	wpa_supplicant -Dwext -iwlan0 -c/etc/wpa_supplicant.conf -B
+        	udhcpc -i wlan0 &
+        	
+                ;;
+        stop)
+        	killall wpa_supplicant
+        	#killall dhclient
+                ;;
+        *)
+                echo "Usage: $0 {start|stop}"
+                exit 1
+                ;;
+esac
+exit 0
+
