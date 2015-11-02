@@ -13,7 +13,8 @@ case "$1" in
                 /usr/local/bin/temp_logger &
                 ;;
         stop)
-                #$CLOCKREADER $OPT4ALL $SETHARDOPT
+                cp /tmp/temperature.log /
+                sync
                 ;;
         *)
                 echo "Usage: $0 {start|stop}"
