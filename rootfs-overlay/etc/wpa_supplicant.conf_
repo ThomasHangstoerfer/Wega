@@ -1,0 +1,15 @@
+ctrl_interface=/var/run/wpa_supplicant
+ap_scan=1
+#ap_scan=2
+
+# reading passphrase from stdin
+network={
+ssid="MY_SSID"
+#psk="my_key"
+psk=4613489342fe98c8d822e94f9aa94bd02e8c613bdbbe763eb503606
+#proto=RSN
+#key_mgmt=WPA-PSK
+#pairwise=CCMP
+#group=CCMP
+}
+
