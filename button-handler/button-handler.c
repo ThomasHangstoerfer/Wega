@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <syslog.h>
+#include <time.h>
 
  /****************************************************************
  * Constants
@@ -288,7 +289,26 @@ int main(int argc, char **argv, char **envp)
 			{
 				printf("\npoll() GPIO %d interrupt occurred -> Button 1\n", 20);
 				syslog(LOG_ERR, "* BUTTON 1 *");
+				syslog(LOG_ERR, "* SHUTDOWN 1 *");
 				//printf("buf[0] = %i\n", (int)buf[0]);
+
+				// SHUTDOWN
+
+				gpio_set_value(82, 0);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(82, 1);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(82, 0);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(82, 1);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(82, 0);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(82, 1);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(82, 0);
+
+				system("/sbin/halt");
 			}
 		}
             
@@ -302,6 +322,24 @@ int main(int argc, char **argv, char **envp)
 			{
 				printf("\npoll() GPIO %d interrupt occurred -> Button 2\n", 7);
 				syslog(LOG_ERR, "* BUTTON 2 *");
+				syslog(LOG_ERR, "* REBOOT *");
+
+				gpio_set_value(83, 0);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(83, 1);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(83, 0);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(83, 1);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(83, 0);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(83, 1);
+				nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
+				gpio_set_value(83, 0);
+
+				system("/sbin/reboot");
+
 			}
 		}
 
