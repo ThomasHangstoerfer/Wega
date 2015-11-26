@@ -1,19 +1,46 @@
 #!/bin/bash
 
+#fix problems with decimal-point
+export LC_ALL=C
+
 DELAY_IN_S=`expr 60 \* 15` # every 15 min
+
+LOG_FILE=/tmp/temperature.log
+
+INPUT_FILE=/sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input
+
+if [ ! -e $INPUT_FILE ]
+then
+	INPUT_FILE=/tmp/temp1_input
+fi
 
 while true 
 do
-	TIMESTAMP=`date -I'seconds'`
-	#TEMP=`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`
 	#TEMP=`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`
 	#TEMP=$(/usr/bin/bc <<<  $TEMP/1000 )
-	let TEMP="`cat /sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input`"
+	TIMESTAMP=`date -I'seconds'`
+	LAST_TIMESTAMP=`tail -1 $LOG_FILE | cut -c1-10`
+	LAST_DAY=`echo $LAST_TIMESTAMP | cut -c9-10`
+	CURRENT_DAY=`echo $TIMESTAMP | cut -c9-10`
+
+	#TODO beim starten des skripts wird ein "Day changed" erkannt
+
+	if [ "$LAST_DAY" == "$CURRENT_DAY" ]
+	then
+		echo "Same day"
+	else
+		echo "Day changed"
+		mv $LOG_FILE /temperature_${LAST_TIMESTAMP}.log
+		touch $LOG_FILE
+		/usr/bin/gnuplot -e "set output '/plot_${LAST_TIMESTAMP}.svg'" /etc/temp.plot -e "plot '/temperature_${LAST_TIMESTAMP}.log' using 1:2 title 'Speicher (lm75)' with lines"
+	fi
+
+	let TEMP=`cat $INPUT_FILE`
 	TEMP=`echo ${TEMP}/1000 | /usr/bin/bc -l`
 	TEMP=`printf "%.1f" $TEMP`
 	echo TEMP: $TEMP
 
-	echo "$TIMESTAMP $TEMP" >> /tmp/temperature.log
+	echo "$TIMESTAMP $TEMP" >> $LOG_FILE
 	if [ -e /sys/class/gpio/gpio82/value ]
 	then
 		if [ `cat /sys/class/gpio/gpio82/value` == '0' ]
@@ -23,6 +50,8 @@ do
 				echo 0 > /sys/class/gpio/gpio82/value
 		fi
 	fi
-	/usr/bin/gnuplot /etc/temp.plot
+	# plot current day to webserver
+	/usr/bin/gnuplot -e "set output '/var/www/temp.svg'" /etc/temp.plot -e "plot '/tmp/temperature.log' using 1:2 title 'Speicher (lm75)' with lines"
+
 	sleep $DELAY_IN_S
 done
