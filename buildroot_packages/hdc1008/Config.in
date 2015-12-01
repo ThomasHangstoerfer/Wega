@@ -1,0 +1,6 @@
+config BR2_PACKAGE_HDC1008
+	bool "hdc1008"
+	depends on BR2_TOOLCHAIN_HAS_THREADS # zeromq
+	help
+	  Userspace tool to communicate with a hdc1008-sensor via i2c
+
