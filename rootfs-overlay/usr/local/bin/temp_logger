@@ -1,17 +1,39 @@
 #!/bin/bash
 
+sleep 5
 #fix problems with decimal-point
 export LC_ALL=C
+echo "Start " `date`
 
 DELAY_IN_S=`expr 60 \* 15` # every 15 min
 
 LOG_FILE=/tmp/temperature.log
+HUM_LOG_FILE=/tmp/humidity.log
 
 INPUT_FILE=/sys/devices/platform/omap/omap_i2c.1/i2c-1/1-0048/temp1_input
+HDC1008_READER=/usr/local/bin/hdc1008
 
 if [ ! -e $INPUT_FILE ]
 then
 	INPUT_FILE=/tmp/temp1_input
+
+	if [ ! -e $HDC1008_READER ]
+	then
+		for i in `seq 1 10`;
+		do
+		echo "ERROR - lm75 and hdc1008 not available"
+			if [ -e /sys/class/gpio/gpio82/value ]
+			then
+				if [ `cat /sys/class/gpio/gpio82/value` == '0' ]
+					then
+						echo 1 > /sys/class/gpio/gpio82/value
+					else
+						echo 0 > /sys/class/gpio/gpio82/value
+				fi
+				sleep 1
+			fi
+		done
+	fi
 fi
 
 while true 
@@ -36,11 +58,22 @@ do
 	fi
 
 	let TEMP=`cat $INPUT_FILE`
+	let HUM=0
+
+	# this is for lm75
 	TEMP=`echo ${TEMP}/1000 | /usr/bin/bc -l`
+
+	# this is for HDC1008
+	TEMP=`${HDC1008_READER} -t`
+	HUM=`${HDC1008_READER} -h`
+
 	TEMP=`printf "%.1f" $TEMP`
-	echo TEMP: $TEMP
+	HUM=`printf "%.1f" $HUM`
+	echo TEMP: $TEMP HUM: $HUM
 
 	echo "$TIMESTAMP $TEMP" >> $LOG_FILE
+	echo "$TIMESTAMP $HUM" >> $HUM_LOG_FILE
+
 	if [ -e /sys/class/gpio/gpio82/value ]
 	then
 		if [ `cat /sys/class/gpio/gpio82/value` == '0' ]
