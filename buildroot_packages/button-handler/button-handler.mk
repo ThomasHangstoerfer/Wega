@@ -1,0 +1,54 @@
+################################################################################
+#
+# button-handler
+#
+################################################################################
+
+#BUTTON_HANDLER_VERSION = 19fe8f5b139e3ee4a8a2f82526a0eadc3f96820f
+BUTTON_HANDLER_VERSION = HEAD
+BUTTON_HANDLER_SITE = git://github.com/ThomasHangstoerfer/GPIO-ButtonHandler.git
+#BUTTON_HANDLER_INSTALL_STAGING = YES
+#BUTTON_HANDLER_DEPENDENCIES = zeromq
+BUTTON_HANDLER_LICENSE = MIT
+BUTTON_HANDLER_LICENSE_FILES = LICENSE
+
+#BUTTON_HANDLER_MAKE_OPT = LD="$(TARGET_CXX)" BUILD_PATH=./build PREFIX=/usr
+#BUTTON_HANDLER_LDFLAGS = $(TARGET_LDFLAGS) -lpthread
+
+define BUTTON_HANDLER_BUILD_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) \
+		LDFLAGS="$(BUTTON_HANDLER_LDFLAGS)" \
+		$(BUTTON_HANDLER_MAKE_OPT) $(if $(BR2_PACKAGE_BUTTON_HANDLER_CLIENT),all) -C $(@D)
+endef
+
+define BUTTON_HANDLER_INSTALL_TARGET_CMDS
+	$(INSTALL) -m 0755 -d $(TARGET_DIR)/usr/local/bin
+	$(INSTALL) -D -m 0755 $(@D)/button-handler $(TARGET_DIR)/usr/local/bin
+#	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) \
+#		$(BUTTON_HANDLER_MAKE_OPT) DESTDIR=$(TARGET_DIR) install -C $(@D)
+endef
+
+define BUTTON_HANDLER_UNINSTALL_TARGET_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) \
+		$(BUTTON_HANDLER_MAKE_OPT) DESTDIR=$(TARGET_DIR) uninstall -C $(@D)
+	$(RM) $(TARGET_DIR)/usr/local/bin/button-handler
+endef
+
+define BUTTON_HANDLER_INSTALL_STAGING_CMDS
+	$(INSTALL) -m 0755 -d $(STAGING_DIR)/usr/local/bin
+	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) \
+		$(BUTTON_HANDLER_MAKE_OPT) DESTDIR=$(STAGING_DIR) install -C $(@D)
+endef
+
+define BUTTON_HANDLER_UNINSTALL_STAGING_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) \
+		$(BUTTON_HANDLER_MAKE_OPT) DESTDIR=$(STAGING_DIR) uninstall -C $(@D)
+	$(RM) $(STAGING_DIR)/usr/local/bin/button-handler
+endef
+
+define BUTTON_HANDLER_CLEAN_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) $(BUTTON_HANDLER_MAKE_OPT) \
+		clean -C $(@D)
+endef
+
+$(eval $(generic-package))

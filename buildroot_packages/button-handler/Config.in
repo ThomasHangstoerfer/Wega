@@ -1,0 +1,5 @@
+config BR2_PACKAGE_BUTTONHANDLER
+	bool "GPIO button-handler"
+	help
+	  Userspace tool to manage events from buttons connected to GPIOs
+
