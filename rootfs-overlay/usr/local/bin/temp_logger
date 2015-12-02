@@ -86,5 +86,7 @@ do
 	# plot current day to webserver
 	/usr/bin/gnuplot -e "set output '/var/www/temp.svg'" /etc/temp.plot -e "plot '/tmp/temperature.log' using 1:2 title 'Speicher (lm75)' with lines"
 
+	hwclock -s
+
 	sleep $DELAY_IN_S
 done
