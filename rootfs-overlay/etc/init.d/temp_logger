@@ -11,10 +11,12 @@ case "$1" in
         start)
                 #$CLOCKREADER $OPT4ALL $SETSYSTEMOPT
                 [ -f /temperature.log ] && cp /temperature.log /tmp/
+                [ -f /humidity.log ] && cp /humiditiy.log /tmp/
                 /usr/local/bin/temp_logger &
                 ;;
         stop)
                 cp /tmp/temperature.log /
+                cp /tmp/humidity.log /
                 sync
                 ;;
         *)
